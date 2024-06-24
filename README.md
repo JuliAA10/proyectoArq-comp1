@@ -6,7 +6,7 @@
 
 - Alvarez Aguirre, Julián
 - Arrieta, Iván
-  -Diaz Otañez, Hugo
+- Diaz Otañez, Hugo
 
 ## Install Libs:
 
