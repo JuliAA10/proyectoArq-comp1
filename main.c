@@ -20,6 +20,9 @@ size_t DELAY_5 = DEFAULT_DELAY;
 
 const unsigned char led[8] = {7, 8, 25, 24, 23, 18, 15, 14};
 
+extern void ElEspiralASMB();
+extern void ElReboteASMB();
+
 void Delay(size_t a){
     a = a * 100000;
     while (a--)
@@ -84,6 +87,16 @@ int main(){
 
 }
 
+void *ElEspiralASMBP() {
+  ElEspiralASMB();
+  return NULL;
+}
+
+void *ElReboteASMBP() {
+  ElReboteASMB();
+  return NULL;
+}
+
 void App(){
     unsigned char option[1];
     Clear();
@@ -106,7 +119,7 @@ void App(){
         Clear();
         printf("\033[?25h");
 
-        printf("----- S E C U E N C I A S  D E  L U C E S -----\n\r");
+        printf("------ S E C U E N C I A S  D E  L U C E S ------\n\r");
         printf("1. Auto Fantastico\n\r");
         printf("2. El Choque\n\r");
         printf("3. El Rebote\n\r");
@@ -144,14 +157,14 @@ void App(){
 
         case '3':
             pthread_create(&threads[0], NULL, keyListener, NULL);
-            pthread_create(&threads[1], NULL, ElRebote, NULL);
+            pthread_create(&threads[1], NULL, ElReboteASMBP, NULL);
             pthread_join(threads[0], NULL);
             pthread_join(threads[1], NULL);
             break;
 
         case '4':
             pthread_create(&threads[0], NULL, keyListener, NULL);
-            pthread_create(&threads[1], NULL, ElEspiral, NULL);
+            pthread_create(&threads[1], NULL, ElEspiralASMBP, NULL);
             pthread_join(threads[0], NULL);
             pthread_join(threads[1], NULL);
             break;
@@ -245,12 +258,6 @@ void LedOutput(unsigned char DISPLAY) {
   }
 }
 
-void LedOff(){
-    for (int i = 0; i < 8; i++){
-        digitalWrite(led[i], 0);
-    }
-}
-
 void *keyListener(){
     while (!QUIT){
         int key = getch();
@@ -287,14 +294,14 @@ void *AutoFantastico() {
       DISPLAY = DISPLAY << 1;
       Delay(DELAY);
     }
-    DELAY_1 = DELAY;
   }
+  DELAY_1 = DELAY;
   QUIT = 0;
-  LedOff();
 }
 
 void *ElChoque() {
   Clear();
+  DELAY = DELAY_2;
   unsigned int table[] = {0x42, 0x24, 0x18, 0x24, 0x42, 0x81};
   unsigned char DISPLAY = 0x81;
   while (!QUIT) {
@@ -310,12 +317,13 @@ void *ElChoque() {
       Delay(DELAY);
     }
   }
+  DELAY_2 = DELAY;
   QUIT = 0;
-  LedOff();
 }
 
 void *ElRebote() {
   Clear();
+  DELAY = DELAY_3;
   while (!QUIT) {
     unsigned char DISPLAY = 0x80;
 
@@ -342,12 +350,13 @@ void *ElRebote() {
     LedOutput(DISPLAY);
     Delay(DELAY);
   }
+  DELAY_3 = DELAY;
   QUIT = 0;
-  LedOff();
 }
 
-void *ElEspiral() { //implementacion con tabla
+void *ElEspiral() { //impementado mediante tablas
   Clear();
+  DELAY = DELAY_4;
   unsigned int table[] = {0x80, 0x81, 0xC1, 0xC3, 0xE3, 0xE7, 0xF7, 0xFF, 0xEF, 0xE7, 0xC7, 0xC3, 0x83, 0x81, 0x1, 0x0};
   unsigned char DISPLAY = 0;
   while (!QUIT) {
@@ -363,12 +372,13 @@ void *ElEspiral() { //implementacion con tabla
       Delay(DELAY);
     }
   }
+  DELAY_4 = DELAY;
   QUIT = 0;
-  LedOff();
 }
 
 void *ElCaos() {
   Clear();
+  DELAY = DELAY_5;
   unsigned char DISPLAY = 0;
   while (!QUIT) {
     unsigned char SUB_DISPLAY_1 = 0x80;
@@ -407,6 +417,6 @@ void *ElCaos() {
       Delay(DELAY);
     }
   }
+  DELAY_5 = DELAY;
   QUIT = 0;
-  LedOff();
 }
