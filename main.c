@@ -24,20 +24,20 @@ extern void ElEspiralASMB();
 extern void ElReboteASMB();
 
 void Delay(size_t a){
-    a = a * 100000;
-    while (a--)
+    a = a * 100000; //para convertirlo en un valor mayor y poder controlarlo
+    while (a--) //retardo
         ;
 }
 
 unsigned int Login(){
     char *right_password = PASSWORD;
-  char input[5];
+  char input[5]; //declarar como array de caracteres
   int i = 0;
   char c;
   printf("Ingrese su password de 5 digitos: ");
 
  while (1) {
-    c = getchar();
+    c = getchar(); //lee un carácter desde la entrada estándar
 
     if (c == '\n') {
       input[i] = '\0';
@@ -60,7 +60,7 @@ unsigned int Login(){
 
 input[i] = '\0';
 
-if (strcmp(input, right_password) == 0) {
+if (strcmp(input, right_password) == 0) { //comparar cadenas con strcmp
   printf("\n\rAcceso concedido\n\r");
   return 1;
 } else {
@@ -114,10 +114,10 @@ void App(){
         exit(0);
 
     do {
-        Delay(2000);
+        Delay(2000); //retardo 2s
         DisplayBinary(0, 0);
         Clear();
-        printf("\033[?25h");
+        printf("\033[?25h"); //muestra el cursor
 
         printf("------ S E C U E N C I A S  D E  L U C E S ------\n\r");
         printf("1. Auto Fantastico\n\r");
@@ -129,13 +129,13 @@ void App(){
         printf("-------------------------------------------------\n\r");
         printf("\n\rSeleccione una opcion: ");
 
-        scanf("%s1", &option[0]);
+        scanf("%s1", &option[0]); //espera la opcion del usuario
 
         if (option[1] != '\0'){
         option[0] = 'i';
         }
 
-        printf("\033[?25l");
+        printf("\033[?25l"); //oculta el cursor
 
     switch (option[0]){
         pthread_t threads[2];
@@ -202,7 +202,7 @@ void Clear(){
 
 }
 
-void DisplayBinary(unsigned char DISPLAY, unsigned int option){
+void DisplayBinary(unsigned char DISPLAY, unsigned int option){ //convierte los 1 en '*' y los 0 en '_'
   char display[8];
   int i = 0;
   for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){
@@ -247,12 +247,12 @@ void DisplayBinary(unsigned char DISPLAY, unsigned int option){
 
 void LedOutput(unsigned char DISPLAY) {
     int i = 0;
-  for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){
+  for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){ //ciclo para controlar los LEDs
     if (POINTER & DISPLAY) {
-        digitalWrite(led[i], 1);
+        digitalWrite(led[i], 1); //se activa
       i++;
     } else {
-        digitalWrite(led[i], 0);
+        digitalWrite(led[i], 0); //no se activa
       i++;
     }
   }
@@ -260,15 +260,15 @@ void LedOutput(unsigned char DISPLAY) {
 
 void *keyListener(){
     while (!QUIT){
-        int key = getch();
+        int key = getch(); //leer una tecla
         if (key == QUIT_KEY)
-            QUIT = 1;
+            QUIT = 1; //establece QUIT a 1 si se presiona la tecla q
         else if (key == KEY_UP){
             if (DELAY - DELAY_INTERVAL != 0)
-                DELAY -= DELAY_INTERVAL;
+                DELAY -= DELAY_INTERVAL; //disminuye
         }
         else if (key == KEY_DOWN){
-            DELAY += DELAY_INTERVAL;
+            DELAY += DELAY_INTERVAL; //aumenta
         }
     }
 }
