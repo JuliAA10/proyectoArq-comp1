@@ -1,3 +1,4 @@
+//Definiciones Globales
 .text
 .global ElReboteASMB
 .global QUIT
@@ -9,8 +10,8 @@
 .global Clear
 
 ElReboteASMB:
-    PUSH {R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,LR}
-    BL Clear
+    PUSH {R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,LR} //Guarda los registros especificos en la pila
+    BL Clear               // Limpia pantalla
     LDR R11, =DELAY_3      // DELAY_3(Address)
     LDR R6, [R11]          // DELAY_3(Value)
     LDR R9, =DELAY         // DELAY(Address)
@@ -18,12 +19,12 @@ ElReboteASMB:
     LDR R10, =QUIT         // QUIT(Address)
 
 while_loop:
-    MOV R8, #7             // Init r = 7, for loop
-    MOV R4, #0x80          // Init DISPLAY with 0x80
-outer_for_loop:
+    MOV R8, #7             // Init r = 7, for loop controla cant iteraciones
+    MOV R4, #0x80          // Init DISPLAY with 0x80 efecto rebote
+outer_for_loop:            // Desplazar a la derecha el valor en R4, mostrarlo y aplicar un retardo
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #1
-    BEQ break_loop
+    BEQ break_loop         // Si QUIT=1 sale del bucle
 
     MOV R0, R4
     MOV R1, #3
@@ -42,10 +43,10 @@ outer_for_loop:
     BNE outer_for_loop
 
     MOV R5, #0             // Init j = 0, inner_for_loop
-inner_for_loop:
+inner_for_loop:            // Efecto de rebote hacia la izquierda se muestran, se envían los datos a la salida y también se aplica un retardo
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #1
-    BEQ break_loop
+    BEQ break_loop         // Si QUIT=1 sale del bucle
 
     MOV R0, R4
     MOV R1, #3
@@ -72,7 +73,7 @@ inner_for_loop:
 
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #1
-    BEQ break_loop
+    BEQ break_loop         // Si QUIT=1 sale del bucle
 
     MOV R0, R4
     MOV R1, #3
@@ -90,10 +91,10 @@ inner_for_loop:
     BEQ while_loop
 
 break_loop:
-    STR R6, [R11]
+    STR R6, [R11]          // Guarda el valor de DELAY de vuelta en DELAY_3
     MOV R0, #0
-    STR R0, [R10]
-    POP {R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,PC}
+    STR R0, [R10]          //Establece QUIT=0
+    POP {R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,PC} //Desapila los registros y los restaura a los valores predeterminados
 
 .data
 .end

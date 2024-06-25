@@ -1,3 +1,4 @@
+//Definiciones Globales
 .text
 .global ElEspiralASMB
 .global QUIT
@@ -9,7 +10,7 @@
 .global Clear
 
 ElEspiralASMB:
-    PUSH {R0,R4,R5,R6,R7,R8,R9,R10,R11,LR}
+    PUSH {R0,R4,R5,R6,R7,R8,R9,R10,R11,LR} //Guarda los registros especificos en la pila
     BL Clear
     MOV R4, #0             // Init DISPLAY with 0
     LDR R11, =DELAY_4      // DELAY_4(Address)
@@ -19,12 +20,12 @@ ElEspiralASMB:
     LDR R10, =QUIT         // QUIT(Address)
     LDR R8, =table
 
-while_loop:
+while_loop:                //Mientras QUIT sea 1..
     MOV R5, #0             // Init i = 0, for loop
-for_loop:
+for_loop:                  //Itera sobre table
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #1
-    BEQ break_loop
+    BEQ break_loop         //Si QUIT=1 sale del bucle
 
     MOV R0, R4
     MOV R1, #4
@@ -41,7 +42,7 @@ for_loop:
 
     ADD R5, R5, #1
     CMP R5, #16
-    BLT for_loop
+    BLT for_loop           //Si es <16 vuelve al bucle
 
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #0
@@ -50,12 +51,12 @@ for_loop:
 break_loop:
     STR R6, [R11]
     MOV R0, #0
-    STR R0, [R10]
-    POP {R0,R4,R5,R6,R7,R8,R9,R10,R11,PC}
+    STR R0, [R10]         //Establece QUIT=0
+    POP {R0,R4,R5,R6,R7,R8,R9,R10,R11,PC} //Desapila los registros y los restaura a los valores predeterminados
 
 .data
 
-table: //#16
+table: //#16 datos estaticos
     .byte 0x80
     .byte 0x81
     .byte 0xC1

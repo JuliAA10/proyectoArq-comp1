@@ -7,11 +7,11 @@
 
 #define PASSWORD "12345"
 #define QUIT_KEY 'q'
-#define DELAY_INTERVAL 250
-#define DEFAULT_DELAY 1000
+#define DELAY_INTERVAL 250 //aumentar o disminuir la velocidad
+#define DEFAULT_DELAY 1000 //retraso default
 
 unsigned int QUIT;
-size_t DELAY;
+size_t DELAY; //variable dinamica para utilizada por las flechas arriba y abajo
 size_t DELAY_1 = DEFAULT_DELAY;
 size_t DELAY_2 = DEFAULT_DELAY;
 size_t DELAY_3 = DEFAULT_DELAY;
@@ -70,22 +70,22 @@ unsigned int Login(){
     }
 }
 
-void MoveCursorToOrigin(){
+void MoveCursorToOrigin(){ //mover el cursor de la terminal al origen
     unsigned int i = 10;
     while (i--)
-        printf("\033[F");
+        printf("\033[F"); //mueve ekl cursor hacia arriba
 }
 
-void Clear(){
-    printf("\033[2J");
+void Clear(){ //limpiar pantalla de la terminal
+    printf("\033[2J"); //borra contenido
     MoveCursorToOrigin();
 }
 
 void DisplayBinary(unsigned char DISPLAY, unsigned int option){ //convierte los 1 en '*' y los 0 en '_'
     char display[8];
     int i = 0;
-    for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){
-        if (POINTER & DISPLAY) {
+    for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){ //POINTER deja desplazar bit a bit desde 0x80
+        if (POINTER & DISPLAY) { //se verifica si el bit correspondiente está encendido
             display[i] = '*';
             i++;
         } else {
@@ -160,7 +160,7 @@ void *AutoFantastico() { //funcion para el autofantastico
     DELAY = DELAY_1;
     pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     while (!QUIT) {
-        unsigned char DISPLAY = 0x80;
+        unsigned char DISPLAY = 0x80; //se verifica si esta encendido o apagado
         for (int i = 0; i < 7; i++) {
             if (QUIT) break;
             DisplayBinary(DISPLAY, 1);
@@ -282,7 +282,7 @@ void *ElCaos() { //ultima funcion por las dudas, del caos
     pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     unsigned char DISPLAY = 0;
     while (!QUIT) {
-        unsigned char SUB_DISPLAY_1 = 0x80;
+        unsigned char SUB_DISPLAY_1 = 0x80; //los utilizamos para mover los leds de derecha a izquierda arriba y abajo
         unsigned char SUB_DISPLAY_2 = 0x01;
         for (int i = 0; i < 4; i++) {
             DISPLAY += SUB_DISPLAY_1;

@@ -19,6 +19,6 @@ gcc main.c -o main -lpthread -lncurses -lcurl
 
 ## Raspberry:
 
-gcc espiral.s rebote.s choque.s autofantastico.s main.c -o main -lpthread -lncurses -lcurl
+gcc espiral.s rebote.s main.c -o main -lpthread -lncurses -lcurl
 
 gcc -o main.o main.c ass.o (todos los assemblys)
