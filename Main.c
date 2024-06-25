@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <pthread.h>
+#include <pthread.h> //biblioteca que se encarga de dividir las tareas de los subprocesos más facilmente
 #include <stdio.h>
 #include "EasyPIO.h"
 #include <ncurses.h>
@@ -18,16 +18,16 @@ size_t DELAY_3 = DEFAULT_DELAY;
 size_t DELAY_4 = DEFAULT_DELAY;
 size_t DELAY_5 = DEFAULT_DELAY;
 
-pthread_mutex_t lock;
+pthread_mutex_t lock; //mutual exclusion, sincroniza el uso de un recurso compartido entre hilos. Así lo definimos
 
-const unsigned char led[8] = {7, 8, 25, 24, 23, 18, 15, 14};
+const unsigned char led[8] = {7, 8, 25, 24, 23, 18, 15, 14}; //definimos los leds
 
-extern void ElEspiralASMB();
-extern void ElReboteASMB();
+extern void ElEspiralASMB(); //assembly Esprial
+extern void ElReboteASMB(); //assembly Rebote
 
-void Delay(size_t a){
-    a = a * 100000;
-    while (a--)
+void Delay(size_t a){ //crear un bucle de espera, permite controlar el tiempo de las secuencias de LEDs
+    a = a * 100000; //para convertirlo en un valor mayor y poder controlarlo
+    while (a--) //retardo
         ;
 }
 
@@ -39,7 +39,7 @@ unsigned int Login(){
     printf("Ingrese su password de 5 digitos: ");
 
     while (1) {
-        c = getchar();
+        c = getchar(); //lee un carácter desde la entrada estándar
 
         if (c == '\n') {
             input[i] = '\0';
@@ -61,7 +61,7 @@ unsigned int Login(){
 
     input[i] = '\0';
 
-    if (strcmp(input, right_password) == 0) {
+    if (strcmp(input, right_password) == 0) { //comparar cadenas con strcmp
         printf("\n\rAcceso concedido\n\r");
         return 1;
     } else {
@@ -81,7 +81,7 @@ void Clear(){
     MoveCursorToOrigin();
 }
 
-void DisplayBinary(unsigned char DISPLAY, unsigned int option){
+void DisplayBinary(unsigned char DISPLAY, unsigned int option){ //convierte los 1 en '*' y los 0 en '_'
     char display[8];
     int i = 0;
     for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){
@@ -126,12 +126,12 @@ void DisplayBinary(unsigned char DISPLAY, unsigned int option){
 
 void LedOutput(unsigned char DISPLAY) {
     int i = 0;
-    for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){
+    for (unsigned int POINTER = 0x80; POINTER > 0; POINTER = POINTER >> 1){ //ciclo para controlar los LEDs
         if (POINTER & DISPLAY) {
-            digitalWrite(led[i], 1);
+            digitalWrite(led[i], 1); //se activa
             i++;
         } else {
-            digitalWrite(led[i], 0);
+            digitalWrite(led[i], 0); //no se activa
             i++;
         }
     }
@@ -139,26 +139,26 @@ void LedOutput(unsigned char DISPLAY) {
 
 void *keyListener(){
     while (!QUIT){
-        int key = getch();
-        pthread_mutex_lock(&lock);
+        int key = getch(); //leer una tecla
+        pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
         if (key == QUIT_KEY)
-            QUIT = 1;
+            QUIT = 1; //establece QUIT a 1 si se presiona la tecla q
         else if (key == KEY_UP){
             if (DELAY - DELAY_INTERVAL != 0)
-                DELAY -= DELAY_INTERVAL;
+                DELAY -= DELAY_INTERVAL; //disminuye
         } else if (key == KEY_DOWN){
-            DELAY += DELAY_INTERVAL;
+            DELAY += DELAY_INTERVAL; //aumenta
         }
-        pthread_mutex_unlock(&lock);
+        pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     }
     return NULL;
 }
 
-void *AutoFantastico() {
+void *AutoFantastico() { //funcion para el autofantastico
     Clear();
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY = DELAY_1;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     while (!QUIT) {
         unsigned char DISPLAY = 0x80;
         for (int i = 0; i < 7; i++) {
@@ -176,18 +176,18 @@ void *AutoFantastico() {
             Delay(DELAY);
         }
     }
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY_1 = DELAY;
     QUIT = 0;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     return NULL;
 }
 
-void *ElChoque() {
+void *ElChoque() { //funcion para el choque implementacion con tablas
     Clear();
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY = DELAY_2;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     unsigned int table[] = {0x42, 0x24, 0x18, 0x24, 0x42, 0x81};
     unsigned char DISPLAY = 0x81;
     while (!QUIT) {
@@ -200,28 +200,28 @@ void *ElChoque() {
             Delay(DELAY);
         }
     }
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY_2 = DELAY;
     QUIT = 0;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     return NULL;
 }
 
-void *ElReboteASMBP() {
+void *ElReboteASMBP() { //funcion void que conecta la funcion del .s con esta para utilizarla más abajo
     ElReboteASMB();
     return NULL;
 }
 
-void *ElEspiralASMBP() {
+void *ElEspiralASMBP() { //funcion void que conecta la funcion del .s con esta para utilizarla más abajo
     ElEspiralASMB();
     return NULL;
 }
 
-void *ElRebote() {
+void *ElRebote() { //funcion del rebote
     Clear();
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY = DELAY_3;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     while (!QUIT) {
         unsigned char DISPLAY = 0x80;
         for (int r = 7; r > 0; r--) {
@@ -244,18 +244,18 @@ void *ElRebote() {
         LedOutput(DISPLAY);
         Delay(DELAY);
     }
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY_3 = DELAY;
     QUIT = 0;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     return NULL;
 }
 
-void *ElEspiral() { // Implementado mediante tablas
+void *ElEspiral() { //funcion del espiral implementado mediante tablas
     Clear();
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY = DELAY_4;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     unsigned int table[] = {0x80, 0x81, 0xC1, 0xC3, 0xE3, 0xE7, 0xF7, 0xFF, 0xEF, 0xE7, 0xC7, 0xC3, 0x83, 0x81, 0x1, 0x0};
     unsigned char DISPLAY = 0;
     while (!QUIT) {
@@ -268,18 +268,18 @@ void *ElEspiral() { // Implementado mediante tablas
             Delay(DELAY);
         }
     }
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY_4 = DELAY;
     QUIT = 0;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     return NULL;
 }
 
-void *ElCaos() {
+void *ElCaos() { //ultima funcion por las dudas, del caos
     Clear();
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY = DELAY_5;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     unsigned char DISPLAY = 0;
     while (!QUIT) {
         unsigned char SUB_DISPLAY_1 = 0x80;
@@ -313,10 +313,10 @@ void *ElCaos() {
             Delay(DELAY);
         }
     }
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock); //bloqueamos que otro hilo acceda a este recurso compartido
     DELAY_5 = DELAY;
     QUIT = 0;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock); //desbloquea, por ende permite que otro hilo acceda a este recurso compartido
     return NULL;
 }
 
@@ -326,7 +326,7 @@ void App(){
 
     int i = 0, a = 0;
 
-    for (i; i < 3; i++){
+    for (i; i < 3; i++){ //funcion para el login, si se intenta 3 veces, aborta
         Delay(2000);
         Clear();
         if (Login())
@@ -337,10 +337,10 @@ void App(){
         exit(0);
 
     do {
-        Delay(2000);
+        Delay(2000); //retardo 2s
         DisplayBinary(0, 0);
         Clear();
-        printf("\033[?25h");
+        printf("\033[?25h"); //muestra el cursor
 
         printf("------ S E C U E N C I A S  D E  L U C E S ------\n\r");
         printf("1. Auto Fantastico\n\r");
@@ -352,19 +352,19 @@ void App(){
         printf("-------------------------------------------------\n\r");
         printf("\n\rSeleccione una opcion: ");
 
-        scanf(" %c", &option[0]);
-        option[1] = '\0'; // Aseguramos que sea un string válido
+        scanf(" %c", &option[0]);  //ignora espacios antes de leer el caracter, y va destinado a option[0]
+        option[1] = '\0'; // Aseguramos que sea un string válido y la cadena termine despues del primer caracter
 
-        printf("\033[?25l");
+        printf("\033[?25l"); //oculta el cursor
 
-        pthread_t threads[2];
+        pthread_t threads[2]; //arreglo de 2 hilos
 
         switch (option[0]){
             case '1':
-                pthread_create(&threads[0], NULL, keyListener, NULL);
-                pthread_create(&threads[1], NULL, AutoFantastico, NULL);
-                pthread_join(threads[0], NULL);
-                pthread_join(threads[1], NULL);
+                pthread_create(&threads[0], NULL, keyListener, NULL); //se crean los hilos
+                pthread_create(&threads[1], NULL, AutoFantastico, NULL); //se crean los hilos
+                pthread_join(threads[0], NULL); //espera a que los hilos terminen
+                pthread_join(threads[1], NULL); //espera a que los hilos terminen
                 break;
 
             case '2':
@@ -411,7 +411,7 @@ void App(){
 
 int main(){
     pioInit();
-    pthread_mutex_init(&lock, NULL);
+    pthread_mutex_init(&lock, NULL); //inicializa el mutex
 
     for (int i = 0; i < 8; i++){
         pinMode(led[i], OUTPUT);
@@ -425,7 +425,7 @@ int main(){
     App();
 
     endwin();
-    pthread_mutex_destroy(&lock);
+    pthread_mutex_destroy(&lock); //destruye el mutex creado anteriormente
 
     return 0;
 }

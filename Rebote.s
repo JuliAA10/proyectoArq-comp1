@@ -41,7 +41,7 @@ outer_for_loop:
     CMP R4, #0b1
     BNE outer_for_loop
 
-    MOV R5, #0             // Init j = 0, inner for loop
+    MOV R5, #0             // Init j = 0, inner_for_loop
 inner_for_loop:
     LDR R7, [R10]          // QUIT(Value)
     CMP R7, #1

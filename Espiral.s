@@ -55,7 +55,7 @@ break_loop:
 
 .data
 
-table: 
+table: //#16
     .byte 0x80
     .byte 0x81
     .byte 0xC1
